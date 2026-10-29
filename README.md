@@ -8,10 +8,14 @@ Sitio estático (HTML + CSS + JavaScript, sin compilar) pensado para publicarse 
 | Página | Archivo | Qué hace |
 |---|---|---|
 | Inicio | `index.html` | Presentación, capas por grupo con mapas, cuadro de petición al asistente. |
-| TerraDrop | `descargas.html` | Selector departamento → municipio → vereda (o por nombre), **Modo Aula** con sorteo reproducible, cola de descarga y ZIP. |
+| TerraDrop | `descargas.html` | Selector departamento → municipio → vereda, buscador de municipios y de veredas por nombre (todo el país), **Modo Aula** con sorteo reproducible de municipio o de vereda, cola de descarga y ZIP. |
 | Aula Geovisor | `aula.html` | Lección: por qué el geovisor es el núcleo de la información, comparación tabla vs. mapa, cuatro geovisores, anatomía de un visor, cuestionario. |
 | Colombia en Mapas, clic a clic | `colombia-en-mapas.html` | Réplica didáctica del visor del IGAC con recorrido guiado de 24 pasos. |
 | Fuentes | `fuentes.html` | Servicios consultados, fecha de verificación y advertencias de calidad. |
+
+## Del dato al dashboard: Colab de KPI → Lovable
+
+`colab/terradrop_kpis_lovable.ipynb` toma el ZIP de TerraDrop (o consulta las APIs con el código DANE), calcula KPI de territorio y cobertura, áreas protegidas, hidrografía y vías/accesibilidad, y entrega `kpis.json`, GeoJSON livianos, tablas CSV, el mapa de ubicación y el prompt para crear el dashboard en Lovable. Ábrelo en Colab: [abrir](https://colab.research.google.com/github/digitalisatrax-red/geoia-colombia-terradrop/blob/main/colab/terradrop_kpis_lovable.ipynb). Detalles en `colab/README.md`.
 
 ## Cómo funciona la descarga
 
@@ -54,6 +58,8 @@ data/*.js                      copias de los JSON para abrir con doble clic (scr
 scripts/make_art.py            genera las ilustraciones
 scripts/build_map.py           genera data/mapa_colombia.json desde las partes GeoJSON del IDEAM
 scripts/make_data_js.py        regenera data/*.js tras cambiar un JSON
+scripts/build_colab.py         arma colab/terradrop_kpis_lovable.ipynb desde colab/fuente/*.py
+colab/                         cuaderno de KPI → prompt de Lovable (+ fuente por celdas)
 ```
 
 ## Datos que NO están en el repositorio
