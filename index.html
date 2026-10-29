@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GeoIA Colombia · Descarga el territorio, entiende el mapa</title>
+<meta name="description" content="TerraDrop: gestor de descarga de datos territoriales de Colombia (municipios, veredas, áreas protegidas, vías, hidrografía y coberturas) con Modo Aula y práctica guiada en geovisores.">
+<meta property="og:title" content="GeoIA Colombia · TerraDrop">
+<meta property="og:description" content="Descarga datos territoriales oficiales por municipio, vereda o departamento y aprende a leer un geovisor.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="home">
+<main id="main">
+
+<section class="hero center">
+  <div class="wrap">
+    <span class="eyebrow chip">Gestión de datos territoriales · automatizada con IA</span>
+    <h1>Descarga el territorio.<br>Entiende el <mark class="hl">mapa</mark>.</h1>
+    <p class="lead">TerraDrop reúne municipios, veredas, áreas protegidas, vías, agua y coberturas de Colombia en un solo gestor. Eliges un lugar, el asistente arma la cola y te llevas archivos listos para QGIS.</p>
+    <div class="actions">
+      <a class="btn dark" href="descargas.html">Empezar una descarga →</a>
+      <a class="btn" href="descargas.html?modo=aula">Entrar al Modo Aula</a>
+    </div>
+    <div class="cmd" role="group" aria-label="Ejemplo de pedido">
+      <span id="cmdText">Descarga veredas, ríos y áreas protegidas de Salento, Quindío</span>
+      <button data-copy="Descarga veredas, ríos y áreas protegidas de Salento, Quindío">Copiar</button>
+    </div>
+
+    <div class="stage">
+      <img class="main" src="assets/img/colombia-3d.svg" alt="Mapa de Colombia en relieve, con los departamentos en colores">
+      <img class="float" style="left:2%;top:4%;width:230px" src="assets/img/robot.svg" alt="" aria-hidden="true">
+      <img class="float" style="right:0;top:30%;width:270px" src="assets/img/machine.svg" alt="" aria-hidden="true">
+      <img class="float" style="left:6%;bottom:-2%;width:210px" src="assets/img/layers.svg" alt="" aria-hidden="true">
+      <img class="float" style="right:10%;top:-2%;width:170px" src="assets/img/magnifier.svg" alt="" aria-hidden="true">
+      <div class="bubble float" style="left:19%;top:12%">¿Municipio? Salento ✓</div>
+      <div class="bubble float" style="right:22%;bottom:12%">9 capas en cola</div>
+    </div>
+  </div>
+</section>
+
+<div class="strip"><div class="wrap">
+  <small>Datos abiertos de</small>
+  <b>IDEAM</b><b>DANE</b><b>IGAC</b><b>RUNAP</b><b>MinAmbiente</b><b>Parques Nacionales</b>
+</div></div>
+
+<section>
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">Qué puedes descargar</span><h2>Nueve capas, un solo clic por lugar</h2><p class="lead">Elige departamento, municipio o vereda. TerraDrop consulta el servicio oficial, recorre todas las páginas de resultados y te entrega GeoJSON válido.</p></div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="tabpanels"></div>
+  </div>
+</section>
+
+<section style="background:#fff;padding-top:0">
+  <div class="wrap">
+    <div class="pillar reveal">
+      <div class="copy"><span class="eyebrow">Datos</span><h2>Todo el territorio, ya ordenado</h2>
+        <p class="lead">Un índice nacional de 1.121 municipios con sus áreas protegidas, ríos principales y humedales, más las veredas del DANE 2024 y la cobertura de la tierra CLC 2024.</p>
+        <div class="metric"><div><b data-count="1121">1.121</b><span>municipios</span></div><div><b data-count="32129">32.129</b><span>veredas</span></div><div><b data-count="9">9</b><span>capas descargables</span></div></div>
+        <div class="quote">“Las vías, los drenajes y las coberturas se consultan en vivo y se filtran al polígono del lugar elegido.”<small>Cómo funciona TerraDrop</small></div></div>
+      <div class="art bg-blue"><img src="assets/img/layers.svg" alt="Cuatro capas de mapa apiladas con un pin encima"></div>
+    </div>
+    <div class="pillar reveal">
+      <div class="copy"><span class="eyebrow">Agentes</span><h2>Pídelo como lo dirías</h2>
+        <p class="lead">Escribe “quiero las vías y los ríos de Jardín, Antioquia” y el asistente encuentra el municipio, marca las capas y deja la cola lista. Funciona en tu navegador: lo que escribes no sale de tu equipo.</p>
+        <div class="metric"><div><b>801</b><span>municipios con áreas protegidas para sortear en el aula</span></div></div>
+        <a class="btn dark" style="margin-top:22px" href="descargas.html?q=vías%20y%20ríos%20de%20Jardín%20Antioquia">Probar el asistente</a></div>
+      <div class="art bg-pink"><img src="assets/img/robot.svg" alt="Robot retro sonriente, el asistente de TerraDrop"></div>
+    </div>
+    <div class="pillar reveal">
+      <div class="copy"><span class="eyebrow">Orquestación</span><h2>Una cola que trabaja por ti</h2>
+        <p class="lead">Cada capa avanza por su cuenta: consulta por páginas, reintenta si el servidor se demora y marca el estado. Al final descargas capa por capa o todo junto en un ZIP.</p>
+        <div class="metric"><div><b>ZIP</b><span>todo el municipio en un archivo</span></div><div><b>GeoJSON</b><span>abre directo en QGIS</span></div></div></div>
+      <div class="art bg-yellow"><img src="assets/img/machine.svg" alt="Máquina dispensadora de datos con bolas de colores"></div>
+    </div>
+    <div class="pillar reveal">
+      <div class="copy"><span class="eyebrow">Aula</span><h2>Del archivo al geovisor</h2>
+        <p class="lead">En Modo Aula, cada estudiante escribe su nombre y recibe un municipio. Descarga sus capas, las abre en QGIS y practica en una réplica guiada de Colombia en Mapas.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px"><a class="btn dark" href="aula.html">Por qué un geovisor</a><a class="btn" href="colombia-en-mapas.html">Colombia en Mapas, clic a clic</a></div></div>
+      <div class="art bg-purple"><img src="assets/img/globe.svg" alt="Globo terráqueo con un satélite en órbita"></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="promptbox">
+      <span class="eyebrow">Asistente territorial</span>
+      <h2>¿Qué quieres descargar?</h2>
+      <form id="askForm" action="descargas.html" method="get">
+        <input name="q" id="askInput" placeholder="Ej. veredas y coberturas de Filandia" autocomplete="off" aria-label="Describe qué quieres descargar">
+        <button class="btn dark" type="submit">Armar descarga</button>
+      </form>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Tu primer municipio está a un clic</h2>
+      <p class="lead">Sin cuenta, sin instalar nada. Descarga, abre en QGIS y aprende a leer el mapa.</p>
+      <a class="btn yellow" href="descargas.html">Abrir TerraDrop</a><a class="btn" href="descargas.html?modo=aula">Modo Aula</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/home.js"></script>
+</body>
+</html>

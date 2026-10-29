@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fuentes y calidad de los datos · GeoIA Colombia</title>
+<meta name="description" content="Servicios oficiales que consulta TerraDrop, fecha de verificación, advertencias de calidad y cómo citar los datos descargados.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="fuentes">
+<main id="main">
+<section style="padding:56px 0 24px">
+  <div class="wrap">
+    <span class="eyebrow chip">Transparencia</span>
+    <h1 style="font-size:clamp(2.2rem,4.6vw,3.8rem)">Fuentes y <mark class="hl">calidad</mark> de los datos</h1>
+    <p class="lead">Cada capa que descargas sale de un servicio público de una entidad. Aquí está cuál, cuándo la verificamos y qué debes tener presente al usarla.</p>
+  </div>
+</section>
+
+<section style="padding-top:24px">
+  <div class="wrap">
+    <h2 style="font-size:2rem">Servicios consultados en vivo</h2>
+    <p class="lead" style="margin-bottom:22px">Verificados el 28 de octubre de 2026 desde un navegador. Los servicios pueden cambiar o caerse sin aviso.</p>
+    <div style="overflow:auto"><table class="tbl" id="live"><thead><tr><th>Capa</th><th>Entidad / servicio</th><th>Punto de consulta</th><th>Nota</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<section style="background:var(--cream)">
+  <div class="wrap">
+    <h2 style="font-size:2rem">Advertencias de calidad</h2>
+    <div class="grid g2" style="margin-top:24px">
+      <div class="card"><h3>Intersecta, no recorta</h3><p>Las capas se filtran con el polígono del territorio: obtienes los elementos que lo tocan, con su geometría completa. Para recortarlos usa <i>Vector → Geoprocesamiento → Cortar</i> en QGIS.</p></div>
+      <div class="card"><h3>Ríos principales no es la red completa</h3><p>La capa “Ríos principales” es una referencia general. Para el detalle usa los drenajes de la capa de hidrografía y contrástalos con la cartografía oficial 1:25.000 del IGAC, que tiene cobertura parcial.</p></div>
+      <div class="card"><h3>RUNAP vía Ministerio de Ambiente</h3><p>El servicio del administrador (Parques Nacionales) no respondió en las pruebas del 28 de octubre de 2026, así que TerraDrop consulta la capa de áreas protegidas del Ministerio de Ambiente (OTL). Verifica el corte y la vigencia antes de usarla en un documento oficial.</p></div>
+      <div class="card"><h3>1.121 o 1.122 municipios</h3><p>El índice local de este proyecto tiene 1.121 municipios (de ellos 801 con áreas protegidas); el servicio del IDEAM trae 1.122 registros. El selector usa el índice local y el límite se pide por código DANE.</p></div>
+      <div class="card"><h3>Tamaño y tiempo</h3><p>Las coberturas CLC y las áreas protegidas de municipios grandes pueden pesar decenas de MB y tardar. Si una capa falla, usa el botón ↻ para reintentarla sin repetir las demás.</p></div>
+      <div class="card"><h3>Uso responsable</h3><p>TerraDrop es una herramienta educativa. No sustituye el trámite ni el concepto de la entidad productora. Cita siempre la fuente original de cada capa.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 style="font-size:2rem">Base nacional local del proyecto</h2>
+    <p class="lead" style="margin-bottom:22px" id="baseIntro">Archivos preparados para el selector y el flujo de trabajo en QGIS y Colab.</p>
+    <div style="overflow:auto"><table class="tbl" id="base"><thead><tr><th>Capa</th><th>Fuente</th><th>Estado</th><th>Observación</th></tr></thead><tbody></tbody></table></div>
+    <h3 style="margin-top:48px">Cómo citar</h3>
+    <div class="card flat"><p style="margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92rem">Datos descargados con TerraDrop (GeoIA Colombia) el <i>[fecha]</i> desde los servicios oficiales de <i>[IDEAM / IGAC / Ministerio de Ambiente y Desarrollo Sostenible]</i>. Cada archivo incluye en su campo <code>metadata</code> el servicio y el filtro usados.</p></div>
+  </div>
+</section>
+</main>
+<script src="assets/js/common.js"></script>
+<script>
+(async function () {
+  const live = [
+    ['Límite municipal', 'DANE · Marco Geoestadístico Nacional, publicado por el IDEAM', 'visualizador.ideam.gov.co/gisserver/rest/services/Entidades_Territoriales/FeatureServer/2', 'Filtro por código DANE (num_dane). El servicio no trae metadatos de vigencia: confirma el corte del MGN en el DANE.'],
+    ['Veredas DANE 2024', 'DANE · publicado por el IDEAM', 'visualizador.ideam.gov.co/gisserver/rest/services/Entidades_Territoriales/FeatureServer/5', 'Filtro por cod_mpio o cod_ver.'],
+    ['Áreas protegidas', 'Ministerio de Ambiente · OTL', 'geo.minambiente.gov.co/server/rest/services/OTL/OTL_Area_Protegida/FeatureServer/0', 'Respuesta rápida en pruebas; reemplaza al servicio de Parques Nacionales.'],
+    ['Vías (3 capas)', 'IGAC · Interés Colombia', 'services2.arcgis.com/RVvWzU3lgJISqdke/arcgis/rest/services/Interes_Colombia/FeatureServer/14, 15, 16', 'Tiempo seco, sin pavimentar y pavimentadas.'],
+    ['Ríos principales', 'Interés Colombia', 'services2.arcgis.com/RVvWzU3lgJISqdke/arcgis/rest/services/Interes_Colombia/FeatureServer/8', 'Puede venir vacía en municipios sin ríos principales.'],
+    ['Drenajes', 'Capa HIDROGRAFIA (ArcGIS Online)', 'services.arcgis.com/vC1CdlKWEAtuT38d/ArcGIS/rest/services/HIDROGRAFIA/FeatureServer/0', 'Atributos: LAYER y NMG (nombre geográfico).'],
+    ['Coberturas CLC 2024', 'IDEAM · Estado de cobertura de la tierra', 'visualizador.ideam.gov.co/gisserver/rest/services/Estado_Cobertura_Tierra/MapServer/10', 'Corine Land Cover 1:100.000, periodo 2024.'],
+  ];
+  document.querySelector('#live tbody').innerHTML = live.map((r) => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td><code>${r[2]}</code></td><td>${r[3]}</td></tr>`).join('');
+  try {
+    const d = await GEO.json('data/fuentes_base_nacional.json');
+    document.getElementById('baseIntro').textContent = `${d.proyecto} · consulta del ${d.fecha_consulta}. ${d.reglas_selector.municipios_catalogados} municipios catalogados; ${d.reglas_selector.municipios_disponibles_con_area_protegida} con al menos un área protegida (criterio del sorteo en Modo Aula).`;
+    document.querySelector('#base tbody').innerHTML = d.capas.map((c) => `<tr><td><b>${GEO.esc(c.nombre)}</b></td><td>${GEO.esc(c.fuente || '')}${c.url ? `<br><code>${GEO.esc(c.url)}</code>` : ''}</td><td>${GEO.esc((c.estado || '').replace(/_/g, ' '))}</td><td>${GEO.esc(c.observacion || '')}</td></tr>`).join('');
+  } catch (e) { document.querySelector('#base tbody').innerHTML = '<tr><td colspan="4">No se pudo cargar data/fuentes_base_nacional.json</td></tr>'; }
+})();
+</script>
+</body>
+</html>

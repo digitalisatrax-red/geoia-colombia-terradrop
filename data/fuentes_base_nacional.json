@@ -1,0 +1,74 @@
+{
+  "proyecto": "Reto GeoIA Colombia",
+  "fecha_consulta": "2026-10-25",
+  "objetivo": "Construir el catálogo nacional para el selector aleatorio y el flujo SIG de 8 horas.",
+  "capas": [
+    {
+      "nombre": "Municipios Colombia",
+      "archivo_local": "municipios_selector.geojson",
+      "fuente": "Servicio nacional de límites administrativos consultado para construir el índice del selector",
+      "url": "https://chamaeleon.supertransporte.gov.co/gisserver/rest/services/Hosted/Limites_Administrativos_Colombia/FeatureServer/0",
+      "tipo": "FeatureServer",
+      "estado": "descargado",
+      "registros": 1121,
+      "observacion": "Se conservaron código DANE, departamento, municipio y geometría. La fuente DANE MGN 2024 queda registrada como fuente primaria para actualización y contraste."
+    },
+    {
+      "nombre": "RUNAP - áreas protegidas",
+      "archivo_local": "runap_latest.zip",
+      "fuente": "Parques Nacionales Naturales de Colombia",
+      "url": "https://storage.googleapis.com/pnn_geodatabase/runap/latest.zip",
+      "servicio": "https://mapas.parquesnacionales.gov.co/arcgis/rest/services/pnn/runap/FeatureServer/0",
+      "tipo": "Shapefile ZIP / FeatureServer",
+      "estado": "descargado",
+      "observacion": "Corte publicado por el administrador del RUNAP. Se utilizó para calcular qué municipios tienen al menos un área protegida."
+    },
+    {
+      "nombre": "Ríos principales de Colombia",
+      "archivo_local": "rios_principales.geojson",
+      "fuente": "Centro Nacional de Memoria Histórica / Datos Abiertos Colombia",
+      "url": "https://serviciosgiscnmh.centrodememoriahistorica.gov.co/agccnmh/rest/services/DCMH/Desplazamientoforzado/FeatureServer/2",
+      "tipo": "FeatureServer / GeoJSON",
+      "estado": "descargado",
+      "registros": 47,
+      "observacion": "Capa nacional de ríos principales. Se utilizará como referencia hidrológica general, no como red completa de drenajes."
+    },
+    {
+      "nombre": "Humedales MADS versión 3",
+      "archivo_local": "humedales_atributos.json",
+      "fuente": "Portal de Datos Abiertos MADS / SIAC",
+      "url": "https://services6.arcgis.com/hxAwRYAu9QHliJ8T/arcgis/rest/services/Humedal_v3_2020_municipios_ctm12/FeatureServer/0",
+      "tipo": "FeatureServer",
+      "estado": "atributos_descargados_servicio_geometrico_registrado",
+      "registros": 1122,
+      "observacion": "La descarga nacional completa de geometrías se mantendrá como servicio y se consultará por municipio para evitar un archivo monolítico."
+    },
+    {
+      "nombre": "Cartografía IGAC 1:25.000",
+      "archivo_local": null,
+      "fuente": "Instituto Geográfico Agustín Codazzi",
+      "url": "https://mapas.igac.gov.co/server/rest/services/carto/carto25000colombia2017/MapServer",
+      "tipo": "MapServer / WFS",
+      "estado": "servicio_registrado_para_consulta",
+      "capas_requeridas": ["Vias", "Via", "Drenaje Sencillo", "Drenaje Doble", "Humedal", "Laguna", "Cienaga", "Pantano", "Embalse", "Otros_Cuerpos_Agua"],
+      "observacion": "La descripción oficial indica cobertura parcial de Colombia. Se consultará y recortará por municipio; no se presentará como cobertura nacional completa."
+    },
+    {
+      "nombre": "MGN DANE 2024",
+      "archivo_local": null,
+      "fuente": "DANE - Marco Geoestadístico Nacional",
+      "url_descarga": "https://geoportal.dane.gov.co/descargas/mgn_2024/MGN2024_00_COLOMBIA.zip",
+      "url_servicio": "https://portalgis.dane.gov.co/mparcgis/rest/services/MGN2024/Serv_CapasMGN_2024/MapServer",
+      "tipo": "Shapefile ZIP / MapServer",
+      "estado": "fuente_registrada_para_actualización",
+      "observacion": "El paquete nacional completo publicado por DANE tiene un tamaño aproximado de 1.5 GB. Para el selector se usará una versión municipal ligera y se conservará esta fuente para la versión completa del repositorio."
+    }
+  ],
+  "reglas_selector": {
+    "criterio_minimo": "areas_protegidas > 0",
+    "municipios_disponibles_con_area_protegida": 801,
+    "municipios_catalogados": 1121,
+    "permite_municipio_sin_area_protegida": false,
+    "observacion": "La lotería inicial debe escoger solo municipios con al menos un área protegida RUNAP intersectada."
+  }
+}

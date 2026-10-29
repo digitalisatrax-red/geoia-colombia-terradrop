@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Colombia en Mapas, clic a clic · tutorial interactivo · GeoIA Colombia</title>
+<meta name="description" content="Réplica didáctica del visor Colombia en Mapas del IGAC con un recorrido guiado: cada botón explica qué hace y cómo se usa, paso a paso.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="tour">
+<main id="main">
+<section style="padding:48px 0 24px">
+  <div class="wrap">
+    <div style="max-width:1000px;margin-bottom:28px">
+      <span class="eyebrow chip">Aula · práctica guiada</span>
+      <h1 style="font-size:clamp(2.2rem,4.6vw,3.8rem)">Colombia en Mapas, <mark class="hl">clic a clic</mark></h1>
+      <p class="lead">Esta es una réplica didáctica del visor del IGAC. Haz clic en cualquier botón del visor, o recorre el tutorial con <b>Siguiente</b>, y descubre qué hace y cómo se usa.</p>
+    </div>
+    <div class="tour">
+      <div class="visor" id="visor" aria-label="Réplica didáctica del visor Colombia en Mapas">
+        <svg class="bg" id="bg" viewBox="0 0 1000 625" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+        <div class="vbar" id="vbar" role="toolbar" aria-label="Barra superior del visor"></div>
+        <button class="vpanel" id="vpanel" data-id="panel" aria-label="Panel de información general"></button>
+        <div class="mctls" id="mctls"></div>
+        <button class="vcoord" id="vcoord" data-id="coords" aria-label="Barra de coordenadas y escala"><span id="cxy">4.6097° N · 74.0817° W</span><span>EPSG:9377 · 1:250.000</span></button>
+      </div>
+      <aside class="tcard" aria-live="polite">
+        <div class="bar"><i id="tbar"></i></div>
+        <div class="n" id="tn"></div>
+        <h3 id="tt"></h3>
+        <p id="tw"></p>
+        <ol id="th"></ol>
+        <div class="nav2">
+          <button class="btn" id="prev">← Anterior</button>
+          <button class="btn dark" id="next">Siguiente →</button>
+        </div>
+        <label class="f" for="jump" style="margin-top:20px">Ir directo a</label>
+        <select id="jump"></select>
+        <div id="finish" hidden style="margin-top:18px">
+          <a class="btn yellow" style="width:100%" href="https://www.colombiaenmapas.gov.co/" target="_blank" rel="noopener">Abrir el visor real ↗</a>
+          <a class="btn" style="width:100%;margin-top:10px" href="descargas.html?modo=aula">Volver al Modo Aula</a>
+        </div>
+      </aside>
+    </div>
+    <div class="notice"><b>Réplica didáctica, no oficial.</b> El mapa de fondo es una ilustración con los límites departamentales de este proyecto, no el mapa real del IGAC. Las explicaciones se redactaron observando el portal; contrástalas con el tutorial y las preguntas frecuentes oficiales dentro del visor (botón “i”).</div>
+  </div>
+</section>
+</main>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/tour.js"></script>
+</body>
+</html>

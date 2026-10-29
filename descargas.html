@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TerraDrop · Gestor de descargas territoriales · GeoIA Colombia</title>
+<meta name="description" content="Elige departamento, municipio o vereda de Colombia y descarga municipio, veredas, RUNAP, vías, hidrografía y coberturas CLC 2024 en GeoJSON. Con Modo Aula y asistente.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="descargas">
+<main id="main">
+<section style="padding:48px 0 24px">
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:28px">
+      <div>
+        <span class="eyebrow chip">TerraDrop · gestor de descargas territoriales</span>
+        <h1 style="font-size:clamp(2.2rem,4.6vw,3.8rem);margin:0">Elige un lugar. <mark class="hl">Llévatelo</mark> en capas.</h1>
+      </div>
+      <div class="seg" role="group" aria-label="Modo de trabajo">
+        <button id="modeMun" aria-pressed="true">Municipio</button>
+        <button id="modeAula" aria-pressed="false">Modo Aula</button>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- columna de controles -->
+      <div>
+        <div class="panel" id="aulaBox" hidden>
+          <h3><span class="step-n">★</span> Tu sorteo de aula</h3>
+          <label class="f" for="stuName">Tu nombre</label>
+          <input type="text" id="stuName" placeholder="Ej. Ana María Rojas" autocomplete="name">
+          <label class="f" for="drawScope">Sortear dentro de</label>
+          <select id="drawScope"></select>
+          <label style="display:flex;gap:10px;align-items:center;margin-top:14px;font-weight:500;cursor:pointer"><input type="checkbox" id="onlyAP" checked style="width:20px;height:20px;accent-color:var(--ink)"> Solo municipios con áreas protegidas <span class="stat" id="apCount"></span></label>
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn dark" id="drawBtn">Sortear mi municipio</button><button class="btn" id="redrawBtn" disabled>Volver a sortear</button></div>
+          <p class="hint">El sorteo es reproducible: el mismo nombre y el mismo alcance dan el mismo municipio hasta que pidas volver a sortear.</p>
+        </div>
+
+        <div class="panel">
+          <h3><span class="step-n">1</span> <span id="pickTitle">Elige el territorio</span></h3>
+          <label class="f" for="finder">Buscar por nombre</label>
+          <input type="text" id="finder" list="finderList" placeholder="Escribe un municipio…" autocomplete="off">
+          <datalist id="finderList"></datalist>
+          <label class="f" for="selDep">Departamento</label>
+          <select id="selDep"></select>
+          <label class="f" for="selMun">Municipio</label>
+          <select id="selMun" disabled></select>
+          <label class="f" for="selVer">Vereda <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+          <select id="selVer" disabled><option>Primero elige un municipio</option></select>
+          <p class="hint" id="pickHint">Elegir un departamento activa todos sus municipios; al elegir un municipio se cargan sus veredas.</p>
+        </div>
+
+        <div class="panel">
+          <h3><span class="step-n">2</span> Capas <button class="btn sm ghost" id="allBtn" style="margin-left:auto">Todas</button><button class="btn sm ghost" id="noneBtn">Ninguna</button></h3>
+          <ul class="layers" id="layerList"></ul>
+          <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+            <button class="btn dark" id="runBtn" disabled>Descargar capas</button>
+            <button class="btn" id="zipBtn" disabled>Todo en ZIP</button>
+            <button class="btn ghost" id="stopBtn" hidden>Cancelar</button>
+          </div>
+          <p class="hint" id="runHint">Elige un municipio para activar la descarga.</p>
+        </div>
+      </div>
+
+      <!-- columna de mapa y asistente -->
+      <div>
+        <div class="panel">
+          <div class="assistant">
+            <img src="assets/img/robot.svg" alt="Asistente GeoIA">
+            <div style="flex:1">
+              <strong style="font-family:var(--display);font-size:1.1rem">Asistente territorial</strong>
+              <form id="askForm" autocomplete="off"><input type="text" id="askInput" placeholder="Ej. vías y ríos de Jardín, Antioquia" aria-label="Pide lo que necesitas en lenguaje natural"><button class="btn dark sm" type="submit">Armar</button></form>
+              <div class="say" id="say">Cuéntame qué lugar y qué capas necesitas. Interpreto tu pedido aquí mismo, en tu navegador, sin enviar lo que escribes a ningún servidor.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mapbox" style="margin-top:18px">
+          <canvas id="mapCanvas" aria-label="Vista previa del territorio y sus capas" role="img"></canvas>
+          <div class="tools"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button><button id="zfit" aria-label="Ver todo" style="font-size:.8rem">⌂</button></div>
+          <div class="legend" id="legend" aria-live="polite"></div>
+        </div>
+
+        <div class="assign" id="assignCard" hidden>
+          <svg id="assignSvg" viewBox="0 0 100 120" aria-hidden="true"></svg>
+          <div>
+            <span class="eyebrow" style="margin:0">Tu asignación</span>
+            <h4 id="aName"></h4>
+            <dl id="aDl"></dl>
+            <button class="btn sm" id="aDown" style="margin-top:12px">Descargar asignación (.geojson)</button>
+          </div>
+        </div>
+
+        <div class="panel" id="routeBox" hidden style="margin-top:18px">
+          <h3><span class="step-n">🧭</span> Tu ruta de aprendizaje</h3>
+          <ol class="route" id="route"></ol>
+        </div>
+
+        <div class="panel" id="doneBox" hidden style="margin-top:18px">
+          <h3>Cómo abrir tus capas</h3>
+          <p style="margin:0;color:var(--ink-2)">Arrastra los archivos <code>.geojson</code> a QGIS (sistema de referencia <b>EPSG:4326</b>) o ábrelos en Colab con <code>geopandas.read_file()</code>. Los elementos descargados <b>intersectan</b> el límite elegido; no están recortados. Para recortarlos usa <i>Vector → Geoprocesamiento → Cortar</i>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/layers.js"></script>
+<script src="assets/js/descargas.js"></script>
+</body>
+</html>

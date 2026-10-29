@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aula Geovisor · por qué el mapa es el núcleo · GeoIA Colombia</title>
+<meta name="description" content="Aprende por qué los geovisores son el núcleo de la información territorial: del dato al mapa, geovisores nacionales de Colombia, anatomía de un visor y práctica guiada.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-page="aula">
+<main id="main">
+
+<section class="hero center" style="padding-bottom:64px">
+  <div class="wrap">
+    <span class="eyebrow chip">Aula Geovisor · lección 1</span>
+    <h1>El geovisor es el <mark class="hl">núcleo</mark> de la información</h1>
+    <p class="lead">Una base de datos te dice <i>qué</i>. Un geovisor te dice <i>dónde</i>, <i>qué hay al lado</i> y <i>qué pasa si cambias algo</i>. Por eso todo dato territorial termina en un visor.</p>
+    <div class="actions"><a class="btn dark" href="#pipeline">Empezar la lección</a><a class="btn" href="colombia-en-mapas.html">Ir al tutorial clic a clic</a></div>
+    <div style="display:flex;justify-content:center;gap:18px;margin-top:36px;flex-wrap:wrap">
+      <img class="float" style="position:static;width:170px" src="assets/img/globe.svg" alt="" aria-hidden="true">
+      <img class="float" style="position:static;width:170px" src="assets/img/cube.svg" alt="" aria-hidden="true">
+      <img class="float" style="position:static;width:170px" src="assets/img/magnifier.svg" alt="" aria-hidden="true">
+    </div>
+  </div>
+</section>
+
+<section id="pipeline" style="padding-top:24px">
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">1 · Del dato a la decisión</span><h2>Todos los caminos pasan por el visor</h2><p class="lead">Toca cada etapa. Verás qué ocurre y qué pregunta se responde ahí.</p></div>
+    <div class="pipeline" role="tablist" id="pipe"></div>
+    <div class="pipeline-body" id="pipeBody"></div>
+  </div>
+</section>
+
+<section style="background:var(--cream)">
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">2 · Sin visor / con visor</span><h2>Una fila no te dice dónde</h2><p class="lead">Elige un municipio. A la izquierda, sus datos como tabla. A la derecha, el mismo territorio en un mapa. ¿Cuál te cuenta más en un vistazo?</p></div>
+    <div style="margin-bottom:18px"><label class="f" for="cmpSel" style="margin-top:0">Municipio</label><select id="cmpSel" style="max-width:340px"></select></div>
+    <div class="compare" id="cmp"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">3 · Geovisores que debes conocer</span><h2>Cuatro visores, cuatro preguntas</h2><p class="lead">Cada entidad publica su propio visor. Aprende para qué sirve cada uno y abre el real cuando termines de practicar.</p></div>
+    <div class="grid g2" id="viewers"></div>
+  </div>
+</section>
+
+<section style="background:var(--cream)">
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">4 · Anatomía de un geovisor</span><h2>Seis piezas que se repiten en todos</h2><p class="lead">Aprende a reconocerlas y podrás usar cualquier visor, aunque nunca lo hayas visto.</p></div>
+    <div class="tour" style="grid-template-columns:1fr 360px">
+      <div class="visor" style="min-height:360px" id="anat">
+        <svg class="bg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" id="anatBg"></svg>
+        <div class="vbar" id="aBar" data-k="barra" style="cursor:pointer"><span class="vbtn">🔎 Explorar</span><span class="vbtn">⏳ Filtros</span><span class="vbtn">📍 Coordenadas</span><span class="vbtn">🗂 Capas</span><span class="vbtn">🖨 Imprimir</span></div>
+        <div class="vpanel" data-k="panel" style="cursor:pointer">›</div>
+        <div class="mctls"><div class="mctl" data-k="zoom" style="cursor:pointer"><b>+</b></div><div class="mctl" data-k="zoom" style="cursor:pointer"><b>−</b></div></div>
+        <div class="vcoord" data-k="coord" style="cursor:pointer"><span>4.6097° N · 74.0817° W</span><span>EPSG:9377 · 1:250.000</span></div>
+        <div style="position:absolute;left:50%;top:48%;width:26px;height:26px;border-radius:50% 50% 50% 0;background:#ff4d4d;transform:rotate(-45deg);border:3px solid #fff;cursor:pointer" data-k="mapa" aria-label="Mapa"></div>
+      </div>
+      <div class="tcard" style="position:static"><div class="n" id="aN"></div><h3 id="aT"></h3><p id="aP"></p><div class="notice" id="aQ"></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="section-head"><span class="eyebrow">5 · Comprueba lo aprendido</span><h2>Tres preguntas rápidas</h2></div>
+    <div id="quiz"></div>
+    <p id="quizScore" style="font-family:var(--display);font-size:1.4rem;font-weight:700"></p>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap"><div class="cta-band">
+    <h2>Ahora hazlo con tu municipio</h2>
+    <p class="lead">Recibe tu territorio, descarga sus capas y practica el recorrido clic a clic.</p>
+    <a class="btn yellow" href="descargas.html?modo=aula">Entrar al Modo Aula</a><a class="btn" href="colombia-en-mapas.html">Tutorial Colombia en Mapas</a>
+  </div></div>
+</section>
+
+</main>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/aula.js"></script>
+</body>
+</html>
