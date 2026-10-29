@@ -310,12 +310,17 @@
     if (redraw) S.attempt++; else S.attempt = S.assign && S.assign.name === name ? S.assign.attempt || 0 : 0;
     const unit = $('drawUnit').value;
     const key = `${norm(name)}|${$('drawScope').value}|${$('onlyAP').checked}|${unit}|${S.attempt}`;
-    const m = p[hash(key) % p.length];
+    let m = p[hash(key) % p.length];
     let ver = null;
     if (unit === 'vereda') {
       say('Sorteando una vereda…');
-      try { const vs = await GEOQ.listVeredas(m.c); if (vs.length) ver = vs[hash(key + '|vereda') % vs.length]; else toast('Ese municipio no tiene veredas en el servicio; te asigné el municipio.'); }
-      catch (e) { toast('No pude consultar las veredas ahora; te asigné el municipio.'); }
+      let netErr = false;
+      for (let i = 0; i < 12 && !ver; i++) {                       // si el municipio no tiene veredas, se sortea otro (mismo resultado para el mismo nombre)
+        const cand = i === 0 ? m : p[hash(key + '|m' + i) % p.length];
+        try { const vs = await GEOQ.listVeredas(cand.c); if (vs.length) { m = cand; ver = vs[hash(key + '|vereda') % vs.length]; } }
+        catch (e) { netErr = true; break; }
+      }
+      if (!ver) toast(netErr ? 'No pude consultar las veredas ahora; te asigné el municipio.' : 'No encontré veredas con esos filtros; te asigné el municipio.');
     }
     S.assign = { name, code: m.c, ver: ver ? { cod: ver.cod, nom: ver.nom } : null, attempt: S.attempt, when: new Date().toISOString() }; store.set('assign', S.assign); store.set('stu', name);
     $('redrawBtn').disabled = false; await selectMun(m.c, { ver: ver ? ver.cod : undefined }); showAssign(); markStep(1);
