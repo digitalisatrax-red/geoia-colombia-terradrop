@@ -128,11 +128,24 @@
   }
 
   // Límite del municipio para dibujarlo en el mapa: geometría real y liviana, pedida en vivo a la API
-  async function limitPreview(code, signal) {
-    const body = new URLSearchParams({ where: `num_dane='${code}'`, outFields: 'num_dane', outSR: '4326', returnGeometry: 'true', maxAllowableOffset: '0.0004', geometryPrecision: '5', f: 'geojson' });
-    const r = await fetchRetry(LAYERS[0].url, { method: 'POST', body, signal }, 1, 20000);
+  async function limitPreview(code, signal, ver) {
+    const L = ver ? LAYERS[1] : LAYERS[0];
+    const body = new URLSearchParams({ where: ver ? `cod_ver='${ver}'` : `num_dane='${code}'`, outFields: ver ? 'cod_ver' : 'num_dane', outSR: '4326', returnGeometry: 'true', maxAllowableOffset: '0.0004', geometryPrecision: '5', f: 'geojson' });
+    const r = await fetchRetry(L.url, { method: 'POST', body, signal }, 1, 20000);
     const j = await r.json(); const f = j.features && j.features[0];
     return f ? f.geometry : null;
+  }
+
+  // Busca veredas por nombre en todo el país (consulta en vivo, sin geometría)
+  async function searchVeredas(text, signal) {
+    const raw = String(text).trim().toUpperCase().replace(/'/g, "''").replace(/[%_]/g, '');
+    if (raw.length < 3) return [];
+    const plain = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const where = [...new Set([raw, plain])].map((t) => `UPPER(nom_ver) LIKE '%${t}%'`).join(' OR ');
+    const p = new URLSearchParams({ where, outFields: 'cod_ver,nom_ver,cod_mpio', returnGeometry: 'false', orderByFields: 'nom_ver', resultRecordCount: '40', f: 'json' });
+    const r = await fetchRetry(LAYERS[1].url, { method: 'POST', body: p, signal }, 2, 25000);
+    const j = await r.json(); if (j.error) throw new Error(j.error.message || 'El servicio devolvió un error');
+    return (j.features || []).map((f) => ({ cod: f.attributes.cod_ver, nom: f.attributes.nom_ver, mun: f.attributes.cod_mpio }));
   }
 
   async function listVeredas(code, signal) {
@@ -171,5 +184,5 @@
   }
 
   window.LAYERS = LAYERS;
-  window.GEOQ = { query, boundary, limitPreview, listVeredas, zip, saveBlob, bboxOf, CLC_COL, simplifyRing, polygonsOf };
+  window.GEOQ = { query, boundary, limitPreview, searchVeredas, listVeredas, zip, saveBlob, bboxOf, CLC_COL, simplifyRing, polygonsOf };
 })();

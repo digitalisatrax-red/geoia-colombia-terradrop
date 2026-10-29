@@ -264,3 +264,9 @@ select:disabled{background:var(--cream);color:var(--muted)}
   .vbtn{font-size:0;padding:8px}.vbtn svg{width:18px;height:18px}
   .assign{grid-template-columns:1fr}
 }
+
+.vres{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px;max-height:240px;overflow:auto}
+.vres button{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font:500 .93rem var(--body);cursor:pointer;color:var(--ink)}
+.vres button:hover,.vres button:focus-visible{border-color:var(--ink);background:var(--cream)}
+.vres small{display:block;color:var(--muted);font-weight:400}
+.vres .none{color:var(--muted);font-size:.92rem;padding:6px 2px}

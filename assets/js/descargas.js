@@ -35,7 +35,30 @@
   selMun.addEventListener('change', () => selectMun(selMun.value));
   selVer.addEventListener('change', () => {
     S.ver = selVer.value ? { cod: selVer.value, nom: selVer.selectedOptions[0].textContent } : null;
-    resetResults(); updateRun(); fitSel();
+    S.liveVer = null; resetResults(); updateRun(); fitSel(); loadVerLive();
+  });
+  function pathOfGeom(g) { const pth = new Path2D(); GEOQ.polygonsOf(g).forEach((pl) => pl.forEach((r) => { r.forEach((c, i) => { const [x, y] = w(c[0], c[1]); i ? pth.lineTo(x, y) : pth.moveTo(x, y); }); pth.closePath(); })); return pth; }
+  function loadVerLive() {
+    if (!S.ver || !S.mun) return draw();
+    const v = S.ver;
+    GEOQ.limitPreview(S.mun.c, undefined, v.cod).then((g) => { if (g && S.ver === v) { S.liveVer = { cod: v.cod, p: pathOfGeom(g), g }; fitGeom(g); draw(); } }).catch(() => {});
+  }
+  // ---- buscar vereda por nombre en todo el país ----
+  async function findVereda() {
+    const t = $('verFinder').value.trim(), box = $('verResults');
+    if (t.length < 3) { toast('Escribe al menos 3 letras'); return; }
+    box.hidden = false; box.innerHTML = '<li class="none">Buscando…</li>';
+    try {
+      const rs = await GEOQ.searchVeredas(t);
+      box.innerHTML = rs.length ? rs.map((v) => { const m = byCode[v.mun]; return `<li><button type="button" data-v="${esc(v.cod)}" data-m="${esc(v.mun)}">${esc(title(v.nom))}<small>${m ? esc(title(m.n)) + ' · ' + esc(title(m.dn)) : 'Municipio ' + esc(v.mun)}</small></button></li>`; }).join('') + (rs.length >= 40 ? '<li class="none">Se muestran las primeras 40. Escribe más del nombre para afinar.</li>' : '') : '<li class="none">Sin resultados. Prueba con otra parte del nombre.</li>';
+    } catch (e) { box.innerHTML = `<li class="none">${/Sin conexión/.test(e.message) ? 'Sin conexión con el servicio de veredas.' : 'No pude consultar las veredas ahora. Inténtalo de nuevo.'}</li>`; }
+  }
+  $('verFindBtn').addEventListener('click', findVereda);
+  $('verFinder').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); findVereda(); } });
+  $('verResults').addEventListener('click', async (e) => {
+    const b = e.target.closest('button[data-v]'); if (!b) return;
+    if (!byCode[b.dataset.m]) return toast('Ese municipio no está en el índice local');
+    $('verResults').hidden = true; await selectMun(b.dataset.m, { ver: b.dataset.v });
   });
   function onFinder() {
     const v = finder.value.trim(); if (!v) return;
@@ -57,7 +80,7 @@
     selDep.value = m.d; fillMun(m.d, m.c); selMun.value = m.c; finder.value = '';
     resetResults(); updateRun();
     $('pickHint').innerHTML = `<b>${esc(title(m.n))}</b> · ${esc(title(m.dn))} · ${fmt(Math.round(m.a))} km² · ${m.ap ? m.ap + ' área(s) protegida(s)' : 'sin áreas protegidas en el índice'}`;
-    S.live = null; fitSel(); draw();
+    S.live = null; S.liveVer = null; fitSel(); draw();
     GEOQ.limitPreview(m.c).then((g) => { if (g && S.mun === m) { const pth = new Path2D(); GEOQ.polygonsOf(g).forEach((pl) => pl.forEach((r) => { r.forEach((c, i) => { const [x, y] = w(c[0], c[1]); i ? pth.lineTo(x, y) : pth.moveTo(x, y); }); pth.closePath(); })); S.live = { code: m.c, p: pth, g }; draw(); } }).catch(() => {});
     selVer.disabled = true; selVer.innerHTML = '<option>Cargando veredas…</option>';
     try {
@@ -100,7 +123,7 @@
   function updateRun() {
     const ok = !!S.mun && S.on.size > 0 && !S.running;
     $('runBtn').disabled = !ok; $('stopBtn').hidden = !S.running;
-    $('runHint').textContent = !S.mun ? 'Elige un municipio para activar la descarga.' : S.running ? 'Trabajando… puedes seguir mirando el mapa.' : `${S.on.size} capa(s) seleccionada(s) para ${title(S.mun.n)}${S.ver ? ' · ' + title(S.ver.nom) : ''}.`;
+    $('runHint').textContent = !S.mun ? 'Elige un municipio o una vereda para activar la descarga.' : S.running ? 'Trabajando… puedes seguir mirando el mapa.' : `${S.on.size} capa(s) seleccionada(s) para ${title(S.mun.n)}${S.ver ? ' · ' + title(S.ver.nom) : ''}.`;
   }
 
   // ---------- ejecución ----------
@@ -173,7 +196,7 @@
   addEventListener('resize', resize);
   function fitBox(x0, y0, x1, y1, pad = 1.25) { const bw = Math.max(x1 - x0, 1), bh = Math.max(y1 - y0, 1); view.s = Math.min(W / (bw * pad), H / (bh * pad)); view.x = (x0 + x1) / 2 - W / (2 * view.s); view.y = (y0 + y1) / 2 - H / (2 * view.s); draw(); }
   function fitGeom(g) { const b = GEOQ.bboxOf(g); const a = w(b[0], b[3]), c = w(b[2], b[1]); fitBox(a[0], a[1], c[0], c[1]); }
-  function fitSel() { if (!S.mun) return fitAll(); const b = S.mun.bb; const a = w(b[0], b[3]), c = w(b[2], b[1]); fitBox(a[0], a[1], c[0], c[1], 1.6); }
+  function fitSel() { if (!S.mun) return fitAll(); if (S.ver && S.liveVer && S.liveVer.cod === S.ver.cod) return fitGeom(S.liveVer.g); const b = S.mun.bb; const a = w(b[0], b[3]), c = w(b[2], b[1]); fitBox(a[0], a[1], c[0], c[1], 1.6); }
   function fitAll() { fitBox(0, 0, MAP.w, MAP.h, 1.08); }
 
   function buildItems(l, fc) {
@@ -201,7 +224,12 @@
     if (S.mun) {
       const mp = getMuniPath(S.mun.c);
       const shape = S.live && S.live.code === S.mun.c ? S.live.p : mp;
-      if (shape && !S.boundary) { ctx.fillStyle = 'rgba(255,201,60,.9)'; ctx.strokeStyle = '#0d0d12'; ctx.lineWidth = 1.6 * px; ctx.fill(shape, 'evenodd'); ctx.stroke(shape); }
+      const vv = S.ver && S.liveVer && S.liveVer.cod === S.ver.cod ? S.liveVer : null;
+      if (shape && !S.boundary) {
+        ctx.strokeStyle = '#0d0d12';
+        if (vv) { ctx.fillStyle = 'rgba(255,201,60,.16)'; ctx.lineWidth = 1.2 * px; ctx.fill(shape, 'evenodd'); ctx.stroke(shape); ctx.fillStyle = 'rgba(255,201,60,.95)'; ctx.lineWidth = 2 * px; ctx.fill(vv.p, 'evenodd'); ctx.stroke(vv.p); }
+        else { ctx.fillStyle = 'rgba(255,201,60,.9)'; ctx.lineWidth = 1.6 * px; ctx.fill(shape, 'evenodd'); ctx.stroke(shape); }
+      }
       if (view.s < 3) { const [x, y] = w(S.mun.lon, S.mun.lat); ctx.fillStyle = '#ff4d4d'; ctx.strokeStyle = '#0d0d12'; ctx.lineWidth = 2 * px; ctx.beginPath(); ctx.arc(x, y, 7 * px, 0, 7); ctx.fill(); ctx.stroke(); }
     }
     ORDER.forEach((id) => {
@@ -280,32 +308,50 @@
     const name = $('stuName').value.trim(); if (name.length < 2) { toast('Escribe tu nombre para sortear'); $('stuName').focus(); return; }
     const p = pool(); if (!p.length) return toast('No hay municipios con esos filtros');
     if (redraw) S.attempt++; else S.attempt = S.assign && S.assign.name === name ? S.assign.attempt || 0 : 0;
-    const key = `${norm(name)}|${$('drawScope').value}|${$('onlyAP').checked}|${S.attempt}`;
+    const unit = $('drawUnit').value;
+    const key = `${norm(name)}|${$('drawScope').value}|${$('onlyAP').checked}|${unit}|${S.attempt}`;
     const m = p[hash(key) % p.length];
-    S.assign = { name, code: m.c, attempt: S.attempt, when: new Date().toISOString() }; store.set('assign', S.assign); store.set('stu', name);
-    $('redrawBtn').disabled = false; await selectMun(m.c); showAssign(); markStep(1);
-    say(`<b>${esc(name)}</b>, tu municipio es <b>${esc(title(m.n))}</b> (${esc(title(m.dn))}). Descarga sus capas y sigue la ruta de aprendizaje.`);
+    let ver = null;
+    if (unit === 'vereda') {
+      say('Sorteando una vereda…');
+      try { const vs = await GEOQ.listVeredas(m.c); if (vs.length) ver = vs[hash(key + '|vereda') % vs.length]; else toast('Ese municipio no tiene veredas en el servicio; te asigné el municipio.'); }
+      catch (e) { toast('No pude consultar las veredas ahora; te asigné el municipio.'); }
+    }
+    S.assign = { name, code: m.c, ver: ver ? { cod: ver.cod, nom: ver.nom } : null, attempt: S.attempt, when: new Date().toISOString() }; store.set('assign', S.assign); store.set('stu', name);
+    $('redrawBtn').disabled = false; await selectMun(m.c, { ver: ver ? ver.cod : undefined }); showAssign(); markStep(1);
+    say(ver ? `<b>${esc(name)}</b>, tu sitio de estudio es la vereda <b>${esc(title(ver.nom))}</b>, en ${esc(title(m.n))} (${esc(title(m.dn))}). Descarga sus capas y sigue la ruta de aprendizaje.` : `<b>${esc(name)}</b>, tu municipio es <b>${esc(title(m.n))}</b> (${esc(title(m.dn))}). Descarga sus capas y sigue la ruta de aprendizaje.`);
   }
   $('drawBtn').onclick = () => drawMine(false); $('redrawBtn').onclick = () => drawMine(true);
   function pathBox(d) { const n = d.match(/-?\d+(?:\.\d+)?/g).map(Number); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < n.length; i += 2) { x0 = Math.min(x0, n[i]); x1 = Math.max(x1, n[i]); y0 = Math.min(y0, n[i + 1]); y1 = Math.max(y1, n[i + 1]); } return [x0, y0, x1, y1]; }
   function showAssign() {
     if (!S.assign) return; const m = byCode[S.assign.code]; $('assignCard').hidden = S.mode !== 'aula';
-    $('aName').textContent = title(m.n);
+    const av = S.assign.ver;
+    $('aName').textContent = av ? title(av.nom) : title(m.n);
     const d = MAP.mun[m.c];
     if (d) { const [x0, y0, x1, y1] = pathBox(d), pw = Math.max(x1 - x0, 1), ph = Math.max(y1 - y0, 1), pad = Math.max(pw, ph) * .08; $('assignSvg').setAttribute('viewBox', `${x0 - pad} ${y0 - pad} ${pw + 2 * pad} ${ph + 2 * pad}`); $('assignSvg').innerHTML = `<path d="${d}" fill="#ffc93c" stroke="#0d0d12" stroke-width="${Math.max(pw, ph) / 60}" stroke-linejoin="round"/>`; }
     else $('assignSvg').innerHTML = '<circle cx="50" cy="60" r="18" fill="#ff4d4d"/>';
+    if (av) {
+      const cur = S.assign;
+      GEOQ.limitPreview(m.c, undefined, av.cod).then((g) => {
+        if (!g || S.assign !== cur) return;
+        let dd = ''; GEOQ.polygonsOf(g).forEach((pl) => pl.forEach((r) => { dd += 'M' + r.map((c) => w(c[0], c[1]).map((n) => n.toFixed(2)).join(',')).join(' ') + 'Z'; }));
+        const [x0, y0, x1, y1] = pathBox(dd), pw = Math.max(x1 - x0, .1), ph = Math.max(y1 - y0, .1), pad = Math.max(pw, ph) * .1;
+        $('assignSvg').setAttribute('viewBox', `${x0 - pad} ${y0 - pad} ${pw + 2 * pad} ${ph + 2 * pad}`);
+        $('assignSvg').innerHTML = `<path d="${dd}" fill="#ffc93c" stroke="#0d0d12" stroke-width="${Math.max(pw, ph) / 60}" stroke-linejoin="round"/>`;
+      }).catch(() => {});
+    }
     const names = m.na ? m.na.split(' | ') : [];
-    $('aDl').innerHTML = [['Estudiante', S.assign.name], ['Código DANE', m.c], ['Departamento', title(m.dn)], ['Área', fmt(Math.round(m.a * 10) / 10) + ' km²'], ['Áreas protegidas', m.ap ? `${m.ap}: ${names.slice(0, 3).join(', ')}${names.length > 3 ? '…' : ''}` : 'ninguna en el índice'], ['Ríos principales', m.nr || '—']].map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join('');
+    $('aDl').innerHTML = [['Estudiante', S.assign.name], ...(av ? [['Vereda', title(av.nom)], ['Código vereda', av.cod], ['Municipio', title(m.n)]] : []), ['Código DANE', m.c], ['Departamento', title(m.dn)], [av ? 'Área del municipio' : 'Área', fmt(Math.round(m.a * 10) / 10) + ' km²'], [av ? 'Áreas protegidas (municipio)' : 'Áreas protegidas', m.ap ? `${m.ap}: ${names.slice(0, 3).join(', ')}${names.length > 3 ? '…' : ''}` : 'ninguna en el índice'], ['Ríos principales', m.nr || '—']].map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join('');
   }
   function assignFeature() {
     const m = byCode[S.assign.code];
-    return { type: 'FeatureCollection', name: 'asignacion_' + m.c, features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [m.lon, m.lat] }, properties: { estudiante: S.assign.name, asignado: S.assign.when, cod_dane: m.c, municipio: title(m.n), departamento: title(m.dn), area_km2: m.a, areas_protegidas: m.ap, nombres_areas: m.na, rios_principales: m.nr, humedales_mads_v3: m.hm } }] };
+    return { type: 'FeatureCollection', name: 'asignacion_' + m.c, features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [m.lon, m.lat] }, properties: { estudiante: S.assign.name, asignado: S.assign.when, sitio: S.assign.ver ? 'vereda' : 'municipio', vereda: S.assign.ver ? title(S.assign.ver.nom) : null, cod_vereda: S.assign.ver ? S.assign.ver.cod : null, cod_dane: m.c, municipio: title(m.n), departamento: title(m.dn), area_km2: m.a, areas_protegidas: m.ap, nombres_areas: m.na, rios_principales: m.nr, humedales_mads_v3: m.hm } }] };
   }
-  $('aDown').onclick = () => { const m = byCode[S.assign.code]; GEOQ.saveBlob(new Blob([JSON.stringify(assignFeature(), null, 1)], { type: 'application/geo+json' }), `asignacion_${m.c}.geojson`); };
+  $('aDown').onclick = () => { const m = byCode[S.assign.code]; GEOQ.saveBlob(new Blob([JSON.stringify(assignFeature(), null, 1)], { type: 'application/geo+json' }), `asignacion_${m.c}${S.assign.ver ? '_v' + S.assign.ver.cod : ''}.geojson`); };
 
   // ruta de aprendizaje
   const STEPS = [
-    { t: 'Recibe tu municipio', d: 'Escribe tu nombre y pulsa “Sortear” (o elige uno tú).' },
+    { t: 'Recibe tu sitio de estudio', d: 'Escribe tu nombre y pulsa “Sortear” (municipio o vereda), o elige uno tú.' },
     { t: 'Descarga tus capas', d: 'Pulsa “Descargar capas” y guarda el ZIP.' },
     { t: 'Ábrelas en QGIS o Colab', d: 'Arrastra los .geojson al lienzo. Toca aquí cuando lo logres.', manual: true },
     { t: 'Entiende el geovisor', d: 'Lee por qué el visor es el núcleo de la información.', href: 'aula.html' },
@@ -327,7 +373,7 @@
   const q = new URLSearchParams(location.search);
   if (store.get('stu', '')) $('stuName').value = store.get('stu', '');
   if (q.get('modo') === 'aula') setMode('aula');
-  if (S.assign && byCode[S.assign.code] && S.mode === 'aula') { $('redrawBtn').disabled = false; await selectMun(S.assign.code); showAssign(); }
+  if (S.assign && byCode[S.assign.code] && S.mode === 'aula') { $('redrawBtn').disabled = false; await selectMun(S.assign.code, { ver: S.assign.ver ? S.assign.ver.cod : undefined }); showAssign(); }
   if (q.get('mun') && byCode[q.get('mun')]) await selectMun(q.get('mun'), { ver: q.get('ver') || undefined });
   if (q.get('q')) { $('askInput').value = q.get('q'); await ask(q.get('q')); }
 })();

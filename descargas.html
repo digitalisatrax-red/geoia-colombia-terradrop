@@ -32,11 +32,13 @@
           <h3><span class="step-n">★</span> Tu sorteo de aula</h3>
           <label class="f" for="stuName">Tu nombre</label>
           <input type="text" id="stuName" placeholder="Ej. Ana María Rojas" autocomplete="name">
+          <label class="f" for="drawUnit">Sitio de estudio</label>
+          <select id="drawUnit"><option value="municipio">Un municipio</option><option value="vereda">Una vereda</option></select>
           <label class="f" for="drawScope">Sortear dentro de</label>
           <select id="drawScope"></select>
           <label style="display:flex;gap:10px;align-items:center;margin-top:14px;font-weight:500;cursor:pointer"><input type="checkbox" id="onlyAP" checked style="width:20px;height:20px;accent-color:var(--ink)"> Solo municipios con áreas protegidas <span class="stat" id="apCount"></span></label>
-          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn dark" id="drawBtn">Sortear mi municipio</button><button class="btn" id="redrawBtn" disabled>Volver a sortear</button></div>
-          <p class="hint">El sorteo es reproducible: el mismo nombre y el mismo alcance dan el mismo municipio hasta que pidas volver a sortear.</p>
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn dark" id="drawBtn">Sortear mi sitio de estudio</button><button class="btn" id="redrawBtn" disabled>Volver a sortear</button></div>
+          <p class="hint">El sorteo es reproducible: el mismo nombre, el mismo alcance y el mismo tipo de sitio dan el mismo resultado hasta que pidas volver a sortear. Si eliges vereda, primero se sortea un municipio con tus filtros y luego una de sus veredas.</p>
         </div>
 
         <div class="panel">
@@ -50,6 +52,9 @@
           <select id="selMun" disabled></select>
           <label class="f" for="selVer">Vereda <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
           <select id="selVer" disabled><option>Primero elige un municipio</option></select>
+          <label class="f" for="verFinder">Buscar vereda por nombre <span style="font-weight:400;text-transform:none;letter-spacing:0">(todo el país)</span></label>
+          <div style="display:flex;gap:8px"><input type="text" id="verFinder" placeholder="Ej. La Palma" autocomplete="off" style="flex:1;min-width:0"><button class="btn sm dark" id="verFindBtn" type="button">Buscar</button></div>
+          <ul class="vres" id="verResults" hidden></ul>
           <p class="hint" id="pickHint">Elegir un departamento activa todos sus municipios; al elegir un municipio se cargan sus veredas.</p>
         </div>
 
@@ -62,7 +67,7 @@
             <button class="btn" id="zipBtn" disabled>Todo en ZIP</button>
             <button class="btn ghost" id="stopBtn" hidden>Cancelar</button>
           </div>
-          <p class="hint" id="runHint">Elige un municipio para activar la descarga.</p>
+          <p class="hint" id="runHint">Elige un municipio o una vereda para activar la descarga.</p>
         </div>
       </div>
 
